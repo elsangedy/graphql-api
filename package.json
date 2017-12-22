@@ -1,0 +1,10 @@
+{
+  "name": "graphql-api",
+  "version": "1.0.0",
+  "description": "API with GraphQL, Node.js, mongoDB, TypeScript, DataLoader",
+  "main": "index.js",
+  "repository": "git@github.com:elsangedy/graphql-api.git",
+  "author": "Munir Ahmed <elsangedy@gmail.com>",
+  "license": "MIT",
+  "private": false
+}
