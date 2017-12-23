@@ -1,1 +1,3 @@
-console.log('1')
+import App from './app'
+
+App.server()
