@@ -1,24 +1,67 @@
 import { GraphQLResolveInfo } from 'graphql'
 
-import { IDInput } from '../../../interfaces/IDInput'
-import { PaginationInput } from '../../../interfaces/PaginationInput'
-import { UserCreateInput, UserUpdateInput, UserUpdatePasswordInput } from '../../../interfaces/User'
-
-const userDefault = {
-  id: 1,
-  name: 'User test'
-}
+import { IContext } from '../../../interfaces/IContext'
+import { IIDInput } from '../../../interfaces/IIDInput'
+import { IPaginationInput } from '../../../interfaces/IPaginationInput'
+import { IUserCreateInput, IUserUpdateInput, IUserUpdatePasswordInput, IUser } from '../../../interfaces/IUser'
+import { User, IUserModel } from '../../../db/user'
+import { IModels } from '../../../interfaces/IModels'
 
 export const userResolvers = {
   Query: {
-    users: (parent, data: PaginationInput, context, info: GraphQLResolveInfo) => ([userDefault]),
-    user: (parent, data: IDInput, context, info: GraphQLResolveInfo) => (userDefault)
+    users: (parent, data: IPaginationInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel[]> => {
+      const { models: { User } } = context
+      const { offset, limit } = data
+
+      return User.find({}, {}, { skit: offset, limit: limit }).exec()
+    },
+    user: (parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
+      const { models: { User } } = context
+      const { id } = data
+
+      return User.findById(id).exec()
+    }
   },
 
   Mutation: {
-    createUser: (parent, data: UserCreateInput, context, info: GraphQLResolveInfo) => (userDefault),
-    updateUser: (parent, data: UserUpdateInput, context, info: GraphQLResolveInfo) => (userDefault),
-    updateUserPassword: (parent, data: UserUpdatePasswordInput, context, info: GraphQLResolveInfo): boolean => (true),
-    deleteUser: (parent, data: IDInput, context, info: GraphQLResolveInfo): boolean => (true),
+    createUser: (parent, data: IUserCreateInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
+      const { models: { User } } = context
+      const { input: { name, email, password } } = data
+
+      const u = new User({
+        name,
+        email,
+        password
+      })
+
+      return u.save()
+    },
+    updateUser: (parent, data: IUserUpdateInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
+      const { models: { User } } = context
+      const { id, input: { name, email } } = data
+
+      return User.findById(id).then((u: IUserModel) => {
+        u.name = name || u.name
+        u.email = email || u.email
+
+        return u.save()
+      })
+    },
+    updateUserPassword: (parent, data: IUserUpdatePasswordInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
+      const { models: { User } } = context
+      const { id, input: { password } } = data
+
+      return User.findById(id).then((u: IUserModel) => {
+        u.password = password || u.password
+
+        return u.save()
+      })
+    },
+    deleteUser: (parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo) => {
+      const { models: { User } } = context
+      const { id } = data
+
+      return User.findByIdAndRemove(id).then((u: IUserModel) => !!u)
+    },
   }
 }
