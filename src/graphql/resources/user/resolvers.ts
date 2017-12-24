@@ -7,14 +7,17 @@ import { IUserCreateInput, IUserUpdateInput, IUserUpdatePasswordInput, IUser } f
 import { User, IUserModel } from '../../../db/user'
 import { IModels } from '../../../interfaces/IModels'
 
+import { compose } from '../../../utils/compose'
+import { checkAuth } from '../../../utils/checkAuth'
+
 export const userResolvers = {
   Query: {
-    users: (parent, data: IPaginationInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel[]> => {
+    users: compose(checkAuth)((parent, data: IPaginationInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel[]> => {
       const { models: { User } } = context
       const { offset, limit } = data
 
-      return User.find({}, {}, { skit: offset, limit: limit }).exec()
-    },
+      return User.find().skip(offset).limit(limit).exec()
+    }),
     user: (parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
       const { models: { User } } = context
       const { id } = data

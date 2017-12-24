@@ -8,24 +8,24 @@ export interface IUser {
 
 export interface IUserCreateInput {
   input: {
-    name: String
-    email: String
-    password: String
+    name: string
+    email: string
+    password: string
   }
 }
 
 export interface IUserUpdateInput {
-  id: String
+  id: string
   input: {
-    name: String
-    email: String
-    password: String
+    name: string
+    email: string
+    password: string
   }
 }
 
 export interface IUserUpdatePasswordInput {
-  id: String
+  id: string
   input: {
-    password: String
+    password: string
   }
 }

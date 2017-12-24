@@ -1,5 +1,6 @@
 import * as express from 'express'
 import * as graphqlHTTP from 'express-graphql'
+import * as jwt from 'jsonwebtoken'
 
 import { IModels } from './interfaces/IModels'
 
@@ -32,8 +33,39 @@ class App {
 
   private graphql(): void {
     this.express.use('/graphql',
-      (req, res, next) => {
+      (req: express.Request, res: express.Response, next: express.NextFunction) => {
         req['context'] = {}
+
+        next()
+      },
+      (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        const authorization: string = req.get('authorization')
+        // const token: string = authorization ? authorization.split(' ')[1] : undefined
+        const token: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YTNmZDk5ODI5NGRmYzFhYTUwN2VmNDIiLCJpYXQiOjE1MTQxNTU0NzF9.UAnBhWBfKY2SvBMs7-YGcvq1kSq518z71ycJym5HjJc'
+
+        req['context']['authorization'] = authorization
+
+        if (!token) { return next() }
+
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded: any) => {
+          if (err) return next()
+
+          this.models.User
+            .findById(decoded.sub)
+            .then((user: IUserModel) => {
+              if (user) {
+                console.log(user)
+                req['context']['authUser'] = {
+                  id: user.get('id'),
+                  email: user.get('email')
+                }
+              }
+
+              return next()
+            })
+        })
+      },
+      (req: express.Request, res: express.Response, next: express.NextFunction) => {
         req['context']['models'] = this.models
 
         next()
