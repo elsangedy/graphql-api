@@ -1,6 +1,8 @@
 import * as express from 'express'
 import * as graphqlHTTP from 'express-graphql'
 import * as cors from 'cors'
+import * as helmet from 'helmet'
+import * as compression from 'compression'
 import * as jwt from 'jsonwebtoken'
 
 import { IModels } from './interfaces/IModels'
@@ -35,7 +37,11 @@ class App {
       allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Enconding'],
       preflightContinue: false,
       optionsSuccessStatus: 204
-    }));
+    }))
+
+    this.express.use(helmet())
+
+    this.express.use(compression())
   }
 
   private database(): void {
