@@ -1,5 +1,6 @@
 import * as express from 'express'
 import * as graphqlHTTP from 'express-graphql'
+import * as cors from 'cors'
 import * as jwt from 'jsonwebtoken'
 
 import { IModels } from './interfaces/IModels'
@@ -20,9 +21,21 @@ class App {
   }
 
   private init(): void {
+    this.middlewares()
+
     this.database()
 
     this.graphql()
+  }
+
+  private middlewares() {
+    this.express.use(cors({
+      origin: '*',
+      methods: ['GET', 'POST'],
+      allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Enconding'],
+      preflightContinue: false,
+      optionsSuccessStatus: 204
+    }));
   }
 
   private database(): void {
