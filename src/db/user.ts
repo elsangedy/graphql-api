@@ -5,7 +5,7 @@ import { genSaltSync, hashSync, compareSync } from 'bcryptjs'
 import { IUser } from '../interfaces/IUser'
 
 export interface IUserModel extends IUser, Document {
-  checkPassword(password: string): boolean;
+  checkPassword(password: string): boolean
 }
 
 export const UserSchema: Schema = new Schema(
@@ -22,6 +22,10 @@ export const UserSchema: Schema = new Schema(
     password: {
       type: String,
       required: true
+    },
+    posts: {
+      type: Schema.Types.ObjectId,
+      ref: 'Post'
     },
     createdAt: {
       type: Date,

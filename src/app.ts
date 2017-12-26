@@ -5,13 +5,15 @@ import * as helmet from 'helmet'
 import * as compression from 'compression'
 import * as jwt from 'jsonwebtoken'
 
+import { RequestedFields } from './utils/ast'
+
 import { IModels } from './interfaces/IModels'
 
 import schema from './graphql/schema'
 import db from './db'
 
 import { IUserModel, UserSchema } from './db/user'
-import { RequestedFields } from './utils/ast';
+import { IPostModel, PostSchema } from './db/post'
 
 class App {
   public express: express.Application
@@ -53,6 +55,7 @@ class App {
     this.models = new Object()
 
     this.models.User = db.model<IUserModel>('User', UserSchema)
+    this.models.Post = db.model<IPostModel>('Post', PostSchema)
   }
 
   private graphql(): void {

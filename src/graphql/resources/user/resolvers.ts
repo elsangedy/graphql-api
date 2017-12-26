@@ -18,7 +18,7 @@ export const userResolvers = {
 
       return User
         .find()
-        .select(requestedFields.getFields(info, ['id']))
+        .select(requestedFields.getFields(info, ['id'], ['posts']))
         .skip(offset)
         .limit(limit)
         .exec()
@@ -29,7 +29,7 @@ export const userResolvers = {
 
       return User
         .findById(id)
-        .select(requestedFields.getFields(info, ['id']))
+        .select(requestedFields.getFields(info, ['id'], ['posts']))
         .exec()
     }
   },
