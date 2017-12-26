@@ -13,12 +13,15 @@ import { checkAuth } from '../../../utils/checkAuth'
 
 export const postResolvers = {
   Post: {
-    author: (post: IPostModel, data, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
-      const { models: { User } } = context
+    author: (post: IPostModel, data, context: IContext, info: GraphQLResolveInfo): Promise<void | IUserModel> => {
+      const { models: { User }, dataloaders: { userLoader } } = context
 
-      return User
-        .findById(post.get('author'))
-        .exec()
+      return userLoader
+        .load({
+          key: post.get('author').toString(),
+          info
+        })
+        .catch((err) => console.log(err))
     }
   },
 

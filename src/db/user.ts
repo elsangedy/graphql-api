@@ -54,4 +54,4 @@ UserSchema.methods.checkPassword = function (password: string): Boolean {
   return compareSync(password, this.password)
 }
 
-export const User: Model<IUserModel> = model<IUserModel>('User', UserSchema)
+export interface UserModel extends Model<IUserModel> { }

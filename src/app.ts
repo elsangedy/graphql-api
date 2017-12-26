@@ -5,12 +5,14 @@ import * as helmet from 'helmet'
 import * as compression from 'compression'
 import * as jwt from 'jsonwebtoken'
 
-import { RequestedFields } from './utils/ast'
+import db from './db'
+
+import schema from './graphql/schema'
 
 import { IModels } from './interfaces/IModels'
 
-import schema from './graphql/schema'
-import db from './db'
+import { RequestedFields } from './utils/ast'
+import { DataLoaderFactory } from './utils/dataloader'
 
 import { IUserModel, UserSchema } from './db/user'
 import { IPostModel, PostSchema } from './db/post'
@@ -21,6 +23,7 @@ class App {
   private models: IModels
 
   private requestedFields: RequestedFields
+  private dataLoaderFactory: DataLoaderFactory
 
   constructor() {
     this.express = express()
@@ -28,11 +31,12 @@ class App {
   }
 
   private init(): void {
-    this.requestedFields = new RequestedFields()
-
     this.middlewares()
 
     this.database()
+
+    this.requestedFields = new RequestedFields()
+    this.dataLoaderFactory = new DataLoaderFactory(this.models, this.requestedFields)
 
     this.graphql()
   }
@@ -88,6 +92,7 @@ class App {
       },
       (req: express.Request, res: express.Response, next: express.NextFunction) => {
         req['context']['models'] = this.models
+        req['context']['dataloaders'] = this.dataLoaderFactory.getLoaders()
         req['context']['requestedFields'] = this.requestedFields
 
         next()

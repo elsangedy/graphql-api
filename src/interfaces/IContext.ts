@@ -1,10 +1,12 @@
 import { IModels } from './IModels'
-import { RequestedFields } from '../utils/ast'
 import { IUserModel } from '../db/user'
+import { IDataLoaders } from './IDataLoaders'
+import { RequestedFields } from '../utils/ast'
 
 export interface IContext {
-  models: IModels
   authorization?: string
+  models: IModels
   authUser?: IUserModel
+  dataloaders?: IDataLoaders
   requestedFields?: RequestedFields
 }

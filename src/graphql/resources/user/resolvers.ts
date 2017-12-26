@@ -4,13 +4,29 @@ import { IContext } from '../../../interfaces/IContext'
 import { IIDInput } from '../../../interfaces/IIDInput'
 import { IPaginationInput } from '../../../interfaces/IPaginationInput'
 import { IUserCreateInput, IUserUpdateInput, IUserUpdatePasswordInput, IUser } from '../../../interfaces/IUser'
-import { User, IUserModel } from '../../../db/user'
+import { IUserModel } from '../../../db/user'
 import { IModels } from '../../../interfaces/IModels'
 
 import { compose } from '../../../utils/compose'
 import { checkAuth } from '../../../utils/checkAuth'
 
 export const userResolvers = {
+  User: {
+    posts: (user: IUserModel, data: IPaginationInput, context: IContext, info: GraphQLResolveInfo) => {
+      const { requestedFields, models: { Post } } = context
+      const { offset, limit } = data
+
+      return Post
+        .find({
+          author: user.get('id')
+        })
+        .select(requestedFields.getFields(info, ['id']))
+        .skip(offset)
+        .limit(limit)
+        .exec()
+    }
+  },
+
   Query: {
     users: compose(checkAuth)((parent, data: IPaginationInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel[]> => {
       const { requestedFields, models: { User } } = context
@@ -73,6 +89,6 @@ export const userResolvers = {
       const { id } = data
 
       return User.findByIdAndRemove(id).then((u: IUserModel) => !!u)
-    },
+    }
   }
 }
