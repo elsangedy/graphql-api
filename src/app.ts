@@ -11,11 +11,14 @@ import schema from './graphql/schema'
 import db from './db'
 
 import { IUserModel, UserSchema } from './db/user'
+import { RequestedFields } from './utils/ast';
 
 class App {
   public express: express.Application
 
   private models: IModels
+
+  private requestedFields: RequestedFields
 
   constructor() {
     this.express = express()
@@ -23,6 +26,8 @@ class App {
   }
 
   private init(): void {
+    this.requestedFields = new RequestedFields()
+
     this.middlewares()
 
     this.database()
@@ -64,7 +69,7 @@ class App {
 
         req['context']['authorization'] = authorization
 
-        if (!token) { return next() }
+        if (!token) return next()
 
         jwt.verify(token, process.env.JWT_SECRET, (err, decoded: any) => {
           if (err) return next()
@@ -72,13 +77,7 @@ class App {
           this.models.User
             .findById(decoded.sub)
             .then((user: IUserModel) => {
-              if (user) {
-                console.log(user)
-                req['context']['authUser'] = {
-                  id: user.get('id'),
-                  email: user.get('email')
-                }
-              }
+              if (user) req['context']['authUser'] = user
 
               return next()
             })
@@ -86,6 +85,7 @@ class App {
       },
       (req: express.Request, res: express.Response, next: express.NextFunction) => {
         req['context']['models'] = this.models
+        req['context']['requestedFields'] = this.requestedFields
 
         next()
       },

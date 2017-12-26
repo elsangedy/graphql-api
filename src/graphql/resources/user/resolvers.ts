@@ -13,16 +13,24 @@ import { checkAuth } from '../../../utils/checkAuth'
 export const userResolvers = {
   Query: {
     users: compose(checkAuth)((parent, data: IPaginationInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel[]> => {
-      const { models: { User } } = context
+      const { requestedFields, models: { User } } = context
       const { offset, limit } = data
 
-      return User.find().skip(offset).limit(limit).exec()
+      return User
+        .find()
+        .select(requestedFields.getFields(info, ['id']))
+        .skip(offset)
+        .limit(limit)
+        .exec()
     }),
     user: (parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
-      const { models: { User } } = context
+      const { requestedFields, models: { User } } = context
       const { id } = data
 
-      return User.findById(id).exec()
+      return User
+        .findById(id)
+        .select(requestedFields.getFields(info, ['id']))
+        .exec()
     }
   },
 

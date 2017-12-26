@@ -21,6 +21,7 @@
     "express": "^4.16.2",
     "express-graphql": "^0.6.11",
     "graphql": "^0.12.3",
+    "graphql-fields": "^1.0.2",
     "graphql-tools": "^2.14.1",
     "helmet": "^3.9.0",
     "jsonwebtoken": "^8.1.0",
