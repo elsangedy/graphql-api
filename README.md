@@ -1,5 +1,5 @@
 # graphql-api
-API with GraphQL, Node.js, mongoDB, TypeScript, DataLoader
+API with GraphQL, Node.js, MongoDB, TypeScript, DataLoader, AST, Mocha, Chai, Nyc
 
 
 ## Setup
@@ -20,4 +20,12 @@ $ docker-compose up -d
 $ yarn run watch
 # two: nodemon watch all changes in ./dist and refesh application
 $ yarn run dev
+```
+
+## Test
+```bash
+# only tests
+$ yarn run test
+# tests and code coverage with nyc
+$ yarn run coverage
 ```
