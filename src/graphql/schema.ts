@@ -30,9 +30,9 @@ const typeDefs = [
 ]
 
 const resolvers = merge(
-  authResolvers,
   postResolvers,
-  userResolvers
+  userResolvers,
+  authResolvers
 )
 
 export default makeExecutableSchema({

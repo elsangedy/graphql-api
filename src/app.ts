@@ -71,8 +71,7 @@ class App {
       },
       (req: express.Request, res: express.Response, next: express.NextFunction) => {
         const authorization: string = req.get('authorization')
-        // const token: string = authorization ? authorization.split(' ')[1] : undefined
-        const token: string = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1YTNmZDk5ODI5NGRmYzFhYTUwN2VmNDIiLCJpYXQiOjE1MTQxNTU0NzF9.UAnBhWBfKY2SvBMs7-YGcvq1kSq518z71ycJym5HjJc'
+        const token: string = authorization ? authorization.split(' ')[1] : undefined
 
         req['context']['authorization'] = authorization
 
@@ -104,16 +103,6 @@ class App {
       }))
     )
   }
-
-  public server(): void {
-    this.express.listen(3000, (error) => {
-      if (error) {
-        console.error('ERROR - Unable to start server.')
-      } else {
-        console.info(`INFO - Server started on port 3000.`)
-      }
-    })
-  }
 }
 
-export default new App()
+export default new App().express

@@ -5,8 +5,18 @@ import * as jwt from 'jsonwebtoken'
 import { IAuth, IAuthLoginInput } from '../../../interfaces/IAuth'
 import { IContext } from '../../../interfaces/IContext'
 import { IUserModel } from '../../../db/user'
+import { compose } from '../../../utils/compose'
+import { checkAuth } from '../../../utils/checkAuth'
 
 export const authResolvers = {
+  Query: {
+    currentUser: compose(checkAuth)((parent, args, context: IContext, info: GraphQLResolveInfo): Promise<IUserModel> => {
+      const { authUser, models: { User } } = context
+
+      return Promise.resolve(authUser)
+    })
+  },
+
   Mutation: {
     login: (parent, data: IAuthLoginInput, context: IContext, info: GraphQLResolveInfo): Promise<IAuth> => {
       const { models: { User } } = context

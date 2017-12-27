@@ -6,6 +6,8 @@ mongoose.Promise = global.Promise
 
 mongoose.set('debug', process.env.NODE_ENV === 'development')
 
-export default mongoose.connect('mongodb://localhost/graphql', {
+const db_name = process.env.NODE_ENV === 'test' ? 'graphql-test' : 'graphql'
+
+export default mongoose.connect(`mongodb://localhost/${db_name}`, {
   useMongoClient: true
 })

@@ -9,6 +9,10 @@ export const authTypes = `
   }
 `
 
+export const authQueries = `
+  currentUser: User
+`
+
 export const authMutations = `
   login(input: AuthLoginInput!): Auth
 `
