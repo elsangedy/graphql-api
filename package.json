@@ -12,7 +12,8 @@
     "build": "npm run gulp build",
     "watch": "npm run gulp watch",
     "dev": "NODE_ENV=development JWT_SECRET=jwt_dev node_modules/.bin/nodemon --delay 5 ./dist",
-    "test": "NODE_ENV=test JWT_SECRET=jwt_test mocha"
+    "test": "NODE_ENV=test JWT_SECRET=jwt_test mocha",
+    "coverage": "nyc --extension .ts --include 'src/**/*.ts' --reporter html npm test"
   },
   "dependencies": {
     "apollo-link": "^1.0.7",
@@ -53,6 +54,7 @@
     "gulp-typescript": "^3.2.3",
     "mocha": "^4.0.1",
     "nodemon": "^1.14.2",
+    "nyc": "^11.4.1",
     "ts-node": "^4.0.2",
     "typescript": "^2.6.2"
   }
