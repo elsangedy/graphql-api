@@ -349,51 +349,53 @@ describe('User', () => {
       })
     })
 
-    it('should delete an existing User', () => {
-      const body = {
-        query: `
-          mutation deleteUser($id: ID!) {
-            deleteUser(id: $id)
+    describe('deleteUser', () => {
+      it('should delete an existing User', () => {
+        const body = {
+          query: `
+            mutation deleteUser($id: ID!) {
+              deleteUser(id: $id)
+            }
+          `,
+          variables: {
+            id: userId
           }
-        `,
-        variables: {
-          id: userId
         }
-      }
 
-      return chai
-        .request(app)
-        .post('/graphql')
-        .set('content-type', 'application/json')
-        .set('authorization', `Bearer ${token}`)
-        .send(JSON.stringify(body))
-        .then((res) => {
-          expect(res.body.data.deleteUser).to.be.true
-        })
-        .catch(handleError)
-    })
+        return chai
+          .request(app)
+          .post('/graphql')
+          .set('content-type', 'application/json')
+          .set('authorization', `Bearer ${token}`)
+          .send(JSON.stringify(body))
+          .then((res) => {
+            expect(res.body.data.deleteUser).to.be.true
+          })
+          .catch(handleError)
+      })
 
-    it('should block operation if token is not provided', () => {
-      const body = {
-        query: `
-          mutation deleteUser($id: ID!) {
-            deleteUser(id: $id)
+      it('should block operation if token is not provided', () => {
+        const body = {
+          query: `
+            mutation deleteUser($id: ID!) {
+              deleteUser(id: $id)
+            }
+          `,
+          variables: {
+            id: userId
           }
-        `,
-        variables: {
-          id: userId
         }
-      }
 
-      return chai
-        .request(app)
-        .post('/graphql')
-        .set('content-type', 'application/json')
-        .send(JSON.stringify(body))
-        .then((res) => {
-          expect(res.body.errors[0].message).to.equal('Unauthorized! Token not provided!')
-        })
-        .catch(handleError)
+        return chai
+          .request(app)
+          .post('/graphql')
+          .set('content-type', 'application/json')
+          .send(JSON.stringify(body))
+          .then((res) => {
+            expect(res.body.errors[0].message).to.equal('Unauthorized! Token not provided!')
+          })
+          .catch(handleError)
+      })
     })
   })
 })

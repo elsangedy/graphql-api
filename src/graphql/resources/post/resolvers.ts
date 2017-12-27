@@ -10,6 +10,8 @@ import { IUserModel } from '../../../db/user'
 
 import { compose } from '../../../utils/compose'
 import { checkAuth } from '../../../utils/checkAuth'
+import { throwError } from '../../../utils/throwError'
+import { handleError } from '../../../utils/handleError'
 
 export const postResolvers = {
   Post: {
@@ -21,7 +23,7 @@ export const postResolvers = {
           key: post.get('author').toString(),
           info
         })
-        .catch((err) => console.log(err))
+        .catch(handleError)
     }
   },
 
@@ -35,21 +37,26 @@ export const postResolvers = {
         .select(requestedFields.getFields(info, ['id']))
         .skip(offset)
         .limit(limit)
-        .exec()
+        .catch(handleError)
     }),
-    post: (parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo): Promise<IPostModel> => {
+    post: compose(checkAuth)((parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo): Promise<IPostModel> => {
       const { requestedFields, models: { Post } } = context
       const { id } = data
 
       return Post
         .findById(id)
         .select(requestedFields.getFields(info, ['id']))
-        .exec()
-    }
+        .then((p: IPostModel) => {
+          throwError(!p, `Post with id ${id} not found!`)
+
+          return p
+        })
+        .catch(handleError)
+    })
   },
 
   Mutation: {
-    createPost: (parent, data: IPostCreateInput, context: IContext, info: GraphQLResolveInfo): Promise<IPostModel> => {
+    createPost: compose(checkAuth)((parent, data: IPostCreateInput, context: IContext, info: GraphQLResolveInfo): Promise<IPostModel> => {
       const { authUser, models: { Post } } = context
       const { input: { title, content } } = data
 
@@ -59,24 +66,43 @@ export const postResolvers = {
         author: authUser.get('id')
       })
 
-      return p.save()
-    },
-    updatePost: (parent, data: IPostUpdateInput, context: IContext, info: GraphQLResolveInfo): Promise<IPostModel> => {
+      return p
+        .save()
+        .catch(handleError)
+    }),
+    updatePost: compose(checkAuth)((parent, data: IPostUpdateInput, context: IContext, info: GraphQLResolveInfo): Promise<IPostModel> => {
       const { models: { Post } } = context
       const { id, input: { title, content } } = data
 
-      return Post.findById(id).then((p: IPostModel) => {
-        p.title = title || p.title
-        p.content = content || p.content
+      return Post
+        .findById(id)
+        .then((p: IPostModel) => {
+          throwError(!p, `Post with id ${id} not found!`)
 
-        return p.save()
-      })
-    },
-    deletePost: (parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo) => {
+          return p
+        })
+        .then((p: IPostModel) => {
+          p.title = title
+          p.content = content
+
+          return p
+            .save()
+            .catch(handleError)
+        })
+    }),
+    deletePost: compose(checkAuth)((parent, data: IIDInput, context: IContext, info: GraphQLResolveInfo) => {
       const { models: { Post } } = context
       const { id } = data
 
-      return Post.findByIdAndRemove(id).then((p: IPostModel) => !!p)
-    },
+      return Post
+        .findByIdAndRemove(id)
+        .then((p: IPostModel) => {
+          throwError(!p, `Post with id ${id} not found!`)
+
+          return p
+        })
+        .then((p: IPostModel) => !!p)
+        .catch(handleError)
+    })
   }
 }

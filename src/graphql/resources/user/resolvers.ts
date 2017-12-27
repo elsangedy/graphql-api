@@ -84,8 +84,8 @@ export const userResolvers = {
           return u
         })
         .then((u: IUserModel) => {
-          u.name = name || u.name
-          u.email = email || u.email
+          u.name = name
+          u.email = email
 
           return u
             .save()
@@ -104,7 +104,7 @@ export const userResolvers = {
           return u
         })
         .then((u: IUserModel) => {
-          u.password = password || u.password
+          u.password = password
 
           return u
             .save()
